@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.tree import plot_tree
+import pickle
+
+# Membaca dataset minimal yang hanya memiliki 'PassengerId' dan 'Survived'
+df = pd.read_csv("titanic.csv")
+
+# Cek kolom yang ada
+print(df.columns)
+
+# Untuk percobaan, kita hanya akan menggunakan 'PassengerId' sebagai fitur (bukan fitur yang baik)
+# Biasanya ini bukan praktik terbaik, karena 'PassengerId' tidak memiliki hubungan dengan hasil.
+X = df[['PassengerId']]  # Fitur: 'PassengerId'
+Y = df['Survived']  # Label: 'Survived'
+
+# Membagi dataset menjadi training dan testing (80% train, 20% test)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+# Membuat model Decision Tree
+model = DecisionTreeClassifier(max_depth=3, random_state=42)
+model.fit(X_train, Y_train)
+
+# Prediksi pada data uji
+Y_pred = model.predict(X_test)
+
+# Evaluasi model
+accuracy = accuracy_score(Y_test, Y_pred)
+print(f"Akurasi: {accuracy:.2f}")
+print(classification_report(Y_test, Y_pred))
+
+# Visualisasi pohon keputusan
+plt.figure(figsize=(10, 5))
+plot_tree(
+    model,
+    feature_names=['PassengerId'],
+    class_names=['Tidak Selamat', 'Selamat'],
+    filled=True,
+)
+plt.show()
+
+# Menyimpan model ke file menggunakan pickle
+with open("titanic_decision_tree_model.pkl", "wb") as file:
+    pickle.dump(model, file)
+
+print("Model berhasil disimpan sebagai 'titanic_decision_tree_model.pkl'")
